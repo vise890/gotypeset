@@ -14,7 +14,7 @@ func testGoTypeset(c gospec.Context) {
 		in := strings.NewReader("# Hello world")
 		expecedOut := "\\part{Hello world}\n\\label{helloworld}\n"
 
-		out, err := toTex(in)
+		out, err := mmd2tex(in)
 		c.Assume(err, IsNil)
 
 		actualOut, err := ioutil.ReadAll(out)

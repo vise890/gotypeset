@@ -20,7 +20,7 @@ func init() {
 	multimarkdownBin = mmd
 }
 
-func toTex(in io.Reader) (io.Reader, error) {
+func mmd2tex(in io.Reader) (io.Reader, error) {
 	cmd := exec.Command(multimarkdownBin, "--to=latex")
 	cmd.Stdin = in
 	out, err := cmd.Output()
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	in := bytes.NewReader(bytes.Join(contents, []byte("\n\n")))
-	out, err := toTex(in)
+	out, err := mmd2tex(in)
 	if err != nil {
 		log.Fatal("Could not convert input to LaTeX")
 	}
