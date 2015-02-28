@@ -30,7 +30,7 @@ func withTempDir(f func() (io.Reader, error)) (io.Reader, error) {
 	if err != nil {
 		log.Fatal("Could not create temporary directory: "+tempDir, err)
 	}
-	defer os.Remove(tempDir)
+	defer os.RemoveAll(tempDir)
 
 	err = os.Chdir(tempDir)
 	if err != nil {
