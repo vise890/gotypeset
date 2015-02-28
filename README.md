@@ -5,11 +5,18 @@ out...
 
 
 ## Usage (for now)
+
 ```bash
 $ vagrant up
 $ vagrant ssh
+```
 
+```bash
 $ cd /vagrant
-$ cd /examples
-$ yes "" | mmd2pdf ./the_meaning_of_life.md
+$ go build
+$ ./gotypeset
+```
+
+```
+POST http://localhost:8080/typeset {input_file.md}
 ```
