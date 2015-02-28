@@ -24,12 +24,7 @@ func withTempDir(f func() (io.Reader, error)) (io.Reader, error) {
 	if err != nil {
 		log.Fatal("Could not get current Working Directory", err)
 	}
-	defer func() {
-		err = os.Chdir(previousWd)
-		if err != nil {
-			log.Fatal("Could not cd to previous Working Directory " + previousWd)
-		}
-	}()
+	defer os.Chdir(previousWd)
 
 	tempDir, err := ioutil.TempDir("", "typesetForge")
 	if err != nil {
