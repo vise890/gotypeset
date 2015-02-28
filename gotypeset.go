@@ -22,7 +22,7 @@ func init() {
 func withTempDir(f func() (io.Reader, error)) (io.Reader, error) {
 	previousWd, err := os.Getwd()
 	if err != nil {
-		log.Fatal("Could not get current Working Directory")
+		log.Fatal("Could not get current Working Directory", err)
 	}
 	defer func() {
 		err = os.Chdir(previousWd)
