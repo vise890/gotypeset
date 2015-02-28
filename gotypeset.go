@@ -41,7 +41,6 @@ func withTempDir(f func() (io.Reader, error)) (io.Reader, error) {
 }
 
 func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
-
 	runMmd2pdf := func() (io.Reader, error) {
 		inputFileName := "in.md"
 		outputFileName := "in.pdf"
