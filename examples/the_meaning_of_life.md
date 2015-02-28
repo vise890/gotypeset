@@ -35,4 +35,3 @@ As described above, the answer to the meaning of life is itself meaningless. We
 can therefore safely conclude that life has no meaning. That is to say,
 whatever purpose an individual decides to dedicate their life to is entirely up
 to said individual.
-
