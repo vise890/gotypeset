@@ -16,10 +16,11 @@ $ vagrant ssh
 
 ```bash
 # in the guest vagrant VM
-$ export GOPATH=$HOME/go
+$ cd
+$ echo 'export GOPATH=$HOME/go' >> .bashrc
+$ source .bashrc
 $ cd ~/go/github.com/vise890/gotypeset
 $ go get && go build && ./gotypeset
 ```
 
 ... And visit `http://localhost:8080/` in your browser.
-
