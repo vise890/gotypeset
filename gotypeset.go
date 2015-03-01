@@ -91,5 +91,8 @@ func main() {
 	http.HandleFunc("/typeset", typesetMarkdown)
 
 	log.Print("Listening on :8080")
-	http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
