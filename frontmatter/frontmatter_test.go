@@ -33,6 +33,25 @@ func describeParsing(c gospec.Context) {
 			c.Expect(actual, Equals, frontMatter{})
 			c.Expect(err, Equals, expectedErr)
 		})
+		c.Specify("returns an error if author is missing", func() {
+			in := []byte("title: a tale of two gophers")
+			actual, err := parseFrontMatter(in)
+
+			expectedErr := ParseError{
+				msg:  "you must specify an `author` (all lowercase) in your frontmatter",
+				code: AuthorRequiredError,
+			}
+
+			c.Expect(actual, Equals, frontMatter{})
+			c.Expect(err, Equals, expectedErr)
+		})
+		c.Specify("returns an error the frontmatter is unparseable", func() {
+			in := []byte("b;labber#blabbr")
+			actual, _ := parseFrontMatter(in)
+
+			c.Expect(actual, Equals, frontMatter{})
+			// TODO: test that an error is actually returned!!
+		})
 	})
 }
 

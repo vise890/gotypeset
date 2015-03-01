@@ -24,6 +24,9 @@ const (
 	// TitleRequiredErr is returned if the input frontmatter does
 	// not contain a `title`
 	TitleRequiredErr errorCode = iota
+	// AuthorRequiredError is returned if the input frontmatter does
+	// not contain an `author`
+	AuthorRequiredError
 )
 
 // ParseError is an error that can be returned when
@@ -40,13 +43,22 @@ func (e ParseError) Error() string {
 func parseFrontMatter(in []byte) (frontMatter, error) {
 	f := frontMatter{}
 	err := yaml.Unmarshal(in, &f)
+	if err != nil {
+		return frontMatter{}, err
+	}
 	if f.Title == "" {
 		return frontMatter{}, ParseError{
 			msg:  "you must specify a `title` (all lowercase) in your frontmatter",
 			code: TitleRequiredErr,
 		}
 	}
-	return f, err
+	if f.Author == "" {
+		return frontMatter{}, ParseError{
+			msg:  "you must specify an `author` (all lowercase) in your frontmatter",
+			code: AuthorRequiredError,
+		}
+	}
+	return f, nil
 }
 
 func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
