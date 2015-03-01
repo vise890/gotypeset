@@ -18,7 +18,5 @@ $ cd /vagrant
 $ go run ./gotypeset.go
 ```
 
-From your host:
-```
-POST http://localhost:8080/typeset {input_file.md}
-```
+... And visit `http://localhost:8080/` in your browser.
+
