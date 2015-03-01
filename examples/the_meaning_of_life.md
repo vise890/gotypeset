@@ -17,9 +17,9 @@ thereof.
 
 ## Methodology & Results
 
-Let \\(\lambda\\) be the meaning of life, then clearly:
+Let $\lambda$ be the meaning of life, then clearly:
 
-\\[ \lambda = 42 \\]
+$$\lambda = 42$$
 
 This is, of course, meaningless nonsense.
 
