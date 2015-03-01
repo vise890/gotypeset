@@ -9,7 +9,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.network "forwarded_port", guest: 8080, host: 8080
 
-  config.vm.synced_folder "./", "/vagrant"
+  config.vm.synced_folder ENV['GOPATH'], "/home/vagrant/go"
 
   config.vm.provision "shell", path: "./scripts/provision.sh"
 end
