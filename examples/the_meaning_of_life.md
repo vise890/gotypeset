@@ -1,10 +1,5 @@
-latex input:        mmd-article-header
-Title:              The Meaning of Life
-Author:             Martino Visintin
-Base Header Level:  2
-LaTeX Mode:         memoir
-latex input:        mmd-article-begin-doc
-latex footer:       mmd-memoir-footer
+title: The Meaning of Life
+author: Martino Visintin
 ---
 
 <!-- \abstract{A quantitative numerical approach is adopted to generate

@@ -1,13 +1,19 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"text/template"
+
+	"gopkg.in/yaml.v2"
 )
+
+const frontMatterBodySeparator string = "---\n"
 
 var mmd2pdfBin string
 
@@ -74,12 +80,70 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 	return withTempDir(runMmd2pdf)
 }
 
+type frontMatter struct {
+	Title  string
+	Author string
+}
+
+func parseFrontMatter(in []byte) (frontMatter, error) {
+	f := frontMatter{}
+	err := yaml.Unmarshal(in, &f)
+	return f, err
+}
+
+func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
+	parts := bytes.Split(mmdIn, []byte(frontMatterBodySeparator))
+	rawF := parts[0]
+	body = parts[1]
+	f, err = parseFrontMatter(rawF)
+	if err != nil {
+		return frontMatter{}, nil, err
+	}
+	return f, body, nil
+}
+
+func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte) {
+	articleTemplate, err := template.New("article.yaml").ParseFiles("./frontmatters/article.yaml")
+	if err != nil {
+		panic(err)
+	}
+
+	fullFrontMatterW := bytes.NewBuffer([]byte{})
+	err = articleTemplate.Execute(fullFrontMatterW, inF)
+	if err != nil {
+		log.Fatal("Could not generate a full template;", err)
+	}
+
+	fullFrontMatter, err = ioutil.ReadAll(fullFrontMatterW)
+	if err != nil {
+		log.Fatal("Could not read generated full template;", err)
+	}
+
+	return fullFrontMatter
+}
+
+func regenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
+	rawMmdIn, err := ioutil.ReadAll(mmdIn)
+	inFrontmatter, body, err := splitOutFrontMatter(rawMmdIn)
+
+	fullFrontMatter := toLaTeXFrontMatter(inFrontmatter)
+
+	fullMmdB := bytes.Join([][]byte{fullFrontMatter, body}, []byte(frontMatterBodySeparator))
+
+	fullMmd = bytes.NewReader(fullMmdB)
+	return fullMmd, nil
+}
+
 func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
-	in, _, err := r.FormFile("inputMmd")
+	rawMmdIn, _, err := r.FormFile("inputMmd")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	in, err := regenerateFrontMatter(rawMmdIn)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	out, err := mmd2pdf(in)
 	if err != nil {
 		log.Fatal(err.Error())
