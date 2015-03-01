@@ -101,8 +101,8 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/typeset", typesetMarkdown)
 
-	log.Print("Listening on :8080")
-	err := http.ListenAndServe(":8080", nil)
+	log.Print("Listening on :9000")
+	err := http.ListenAndServe(":9000", nil)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

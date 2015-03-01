@@ -23,4 +23,4 @@ $ cd ~/go/github.com/vise890/gotypeset
 $ go get && go build && ./gotypeset
 ```
 
-... And visit `http://localhost:8080/` in your browser.
+... And visit `http://localhost:9000/` in your browser.
