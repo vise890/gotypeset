@@ -18,7 +18,12 @@
           <form method="post" enctype="multipart/form-data" action="/typeset">
             <div class="input-group">
               <div class="well">
-                <label for="inputMmd">Select a markdown file ...</label>
+                <label for="inputMmd">
+                  Select a
+                  <a href="https://rawgit.com/fletcher/human-markdown-reference/master/index.html">
+                    MultiMarkdown
+                  </a> file ...
+                </label>
                 <input type="file" name="inputMmd" />
               </div>
               <input type="submit" class="form-control btn btn-large btn-success" value="Typeset!" />
