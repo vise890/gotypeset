@@ -75,7 +75,11 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 }
 
 func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
-	in := r.Body
+	in, _, err := r.FormFile("inputMmd")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	out, err := mmd2pdf(in)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -88,6 +92,7 @@ func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.Handle("/", http.FileServer(http.Dir("static")))
 	http.HandleFunc("/typeset", typesetMarkdown)
 
 	log.Print("Listening on :8080")
