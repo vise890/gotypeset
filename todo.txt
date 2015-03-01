@@ -1,4 +1,5 @@
 BUG: Uppercase (Title, Author) in input break YAML unmarshalling
+BUG: if no file is provided, server panics
 move frontmatter to JSON
 add support for citations
 tests

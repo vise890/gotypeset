@@ -8,6 +8,8 @@ out...
 
 ```bash
 # in your host
+$ git clone https://github.com/vise890/gotypeset
+$ cd gotypeset
 $ vagrant up
 $ vagrant ssh
 ```
