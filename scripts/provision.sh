@@ -15,7 +15,7 @@ sudo apt-get dist-upgrade --assume-yes
 
 
 echo "==> Installing utils"
-sudo apt-get install --assume-yes git htop
+sudo apt-get install --assume-yes git htop golang
 
 
 echo "==> Installing LaTex"
