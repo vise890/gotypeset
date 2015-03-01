@@ -1,0 +1,5 @@
+BUG: Uppercase (Title, Author) in input break YAML unmarshalling
+move frontmatter to JSON
+add support for citations
+tests
+split out into files
