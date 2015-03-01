@@ -14,8 +14,9 @@ $ vagrant ssh
 
 ```bash
 # in the guest vagrant VM
-$ cd /vagrant
-$ go run ./gotypeset.go
+$ git clone https://github.com/vise890/gotypeset
+$ cd gotypeset
+$ go build && ./gotypeset
 ```
 
 ... And visit `http://localhost:8080/` in your browser.
