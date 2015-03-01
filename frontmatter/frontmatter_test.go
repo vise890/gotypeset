@@ -21,6 +21,18 @@ func describeParsing(c gospec.Context) {
 
 			c.Expect(actual, Equals, expected)
 		})
+		c.Specify("returns an error if title is missing", func() {
+			in := []byte("author: G. Gopherious")
+			actual, err := parseFrontMatter(in)
+
+			expectedErr := ParseError{
+				msg:  "you must specify a `title` (all lowercase) in your frontmatter",
+				code: TitleRequiredErr,
+			}
+
+			c.Expect(actual, Equals, frontMatter{})
+			c.Expect(err, Equals, expectedErr)
+		})
 	})
 }
 

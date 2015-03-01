@@ -18,9 +18,34 @@ type frontMatter struct {
 	Author string
 }
 
+type errorCode int
+
+const (
+	// TitleRequiredErr is returned if the input frontmatter does
+	// not contain a `title`
+	TitleRequiredErr errorCode = iota
+)
+
+// ParseError is an error that can be returned when
+// parsing frontmatters
+type ParseError struct {
+	msg  string
+	code errorCode
+}
+
+func (e ParseError) Error() string {
+	return e.msg
+}
+
 func parseFrontMatter(in []byte) (frontMatter, error) {
 	f := frontMatter{}
 	err := yaml.Unmarshal(in, &f)
+	if f.Title == "" {
+		return frontMatter{}, ParseError{
+			msg:  "you must specify a `title` (all lowercase) in your frontmatter",
+			code: TitleRequiredErr,
+		}
+	}
 	return f, err
 }
 
