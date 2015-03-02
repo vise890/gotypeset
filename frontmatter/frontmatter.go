@@ -103,12 +103,12 @@ latex footer:       mmd-memoir-footer
 	fullFrontMatterW := bytes.NewBuffer([]byte{})
 	err = articleTemplate.Execute(fullFrontMatterW, inF)
 	if err != nil {
-		log.Fatal("Could not generate a full template;", err)
+		log.Fatal("Could not generate a full frontmatter;", err)
 	}
 
 	fullFrontMatter, err = ioutil.ReadAll(fullFrontMatterW)
 	if err != nil {
-		log.Fatal("Could not read generated full template;", err)
+		log.Fatal("Could not read generated full frontmatter;", err)
 	}
 
 	return fullFrontMatter
