@@ -37,10 +37,7 @@ func TestFrontMatterParsing(t *testing.T) {
 			result, err := parseFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ParseError{
-					msg:  "you must specify a `title` (all lowercase) in your frontmatter",
-					code: TitleRequiredErr,
-				})
+				So(err, ShouldResemble, newError(TitleRequired))
 			})
 
 			Convey("The parse result should be empty", func() {
@@ -56,10 +53,7 @@ func TestFrontMatterParsing(t *testing.T) {
 			result, err := parseFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ParseError{
-					msg:  "you must specify an `author` (all lowercase) in your frontmatter",
-					code: AuthorRequiredError,
-				})
+				So(err, ShouldResemble, newError(AuthorRequired))
 			})
 
 			Convey("The result should be empty", func() {
@@ -152,10 +146,7 @@ func TestFrontMatterSplitting(t *testing.T) {
 			resultFrontMatter, resultBody, err := splitOutFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ParseError{
-					msg:  "you must specify a frontmatter with a `title` and an `author` (all lowercase)",
-					code: FrontMatterRequiredError,
-				})
+				So(err, ShouldResemble, newError(FrontMatterRequired))
 			})
 
 			Convey("The result should contain an empty frontmatter", func() {
@@ -243,10 +234,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ParseError{
-					msg:  "you must specify a `title` (all lowercase) in your frontmatter",
-					code: TitleRequiredErr,
-				})
+				So(err, ShouldResemble, newError(TitleRequired))
 			})
 
 			Convey("The result should be nil", func() {
@@ -263,10 +251,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ParseError{
-					msg:  "you must specify a frontmatter with a `title` and an `author` (all lowercase)",
-					code: FrontMatterRequiredError,
-				})
+				So(err, ShouldResemble, newError(FrontMatterRequired))
 			})
 
 			Convey("The result should be nil", func() {

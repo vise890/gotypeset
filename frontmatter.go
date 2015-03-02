@@ -21,15 +21,15 @@ type frontMatter struct {
 type errorCode int
 
 const (
-	// TitleRequiredErr is returned if the input frontmatter does
+	// TitleRequired is returned if the input frontmatter does
 	// not contain a `title`
-	TitleRequiredErr errorCode = iota
-	// AuthorRequiredError is returned if the input frontmatter does
+	TitleRequired errorCode = iota
+	// AuthorRequired is returned if the input frontmatter does
 	// not contain an `author`
-	AuthorRequiredError
-	// FrontMatterRequiredError is returned if the input does not
+	AuthorRequired
+	// FrontMatterRequired is returned if the input does not
 	// contain a frontmatter
-	FrontMatterRequiredError
+	FrontMatterRequired
 )
 
 // ParseError is an error that can be returned when
@@ -37,6 +37,22 @@ const (
 type ParseError struct {
 	msg  string
 	code errorCode
+}
+
+func newError(c errorCode) ParseError {
+	var msg string
+	switch c {
+	case TitleRequired:
+		msg = "you must specify a `title` (all lowercase) in your frontmatter"
+	case AuthorRequired:
+		msg = "you must specify an `author` (all lowercase) in your frontmatter"
+	case FrontMatterRequired:
+		msg = "you must specify a frontmatter with a `title` and an `author` (all lowercase)"
+	}
+	return ParseError{
+		msg:  msg,
+		code: c,
+	}
 }
 
 func (e ParseError) Error() string {
@@ -50,16 +66,10 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 		return frontMatter{}, err
 	}
 	if f.Title == "" {
-		return frontMatter{}, ParseError{
-			msg:  "you must specify a `title` (all lowercase) in your frontmatter",
-			code: TitleRequiredErr,
-		}
+		return frontMatter{}, newError(TitleRequired)
 	}
 	if f.Author == "" {
-		return frontMatter{}, ParseError{
-			msg:  "you must specify an `author` (all lowercase) in your frontmatter",
-			code: AuthorRequiredError,
-		}
+		return frontMatter{}, newError(AuthorRequired)
 	}
 	return f, nil
 }
@@ -67,10 +77,7 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 	parts := bytes.Split(mmdIn, []byte(frontMatterSeparator))
 	if len(parts) == 1 {
-		return frontMatter{}, []byte{}, ParseError{
-			msg:  "you must specify a frontmatter with a `title` and an `author` (all lowercase)",
-			code: FrontMatterRequiredError,
-		}
+		return frontMatter{}, []byte{}, newError(FrontMatterRequired)
 	}
 	rawF := parts[0]
 	body = bytes.Join(parts[1:], []byte(frontMatterSeparator))
