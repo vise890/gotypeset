@@ -167,3 +167,28 @@ func TestFrontMatterSplitting(t *testing.T) {
 		})
 	})
 }
+
+func TestToLaTeXFrontMatter(t *testing.T) {
+
+	Convey("Given a valid frontMatter", t, func() {
+		in := frontMatter{
+			Title:  "A tale of two gophers",
+			Author: "G. Gopherious",
+		}
+		Convey("When converting to a LaTeX frontmatter", func() {
+			result := toLaTeXFrontMatter(in)
+
+			Convey("The result should contain the given Title, Author and  the extra LaTeX-specific metadata", func() {
+				expected := `latex input:        mmd-article-header
+Title:              A tale of two gophers
+Author:             G. Gopherious
+Base Header Level:  2
+LaTeX Mode:         memoir
+latex input:        mmd-article-begin-doc
+latex footer:       mmd-memoir-footer
+`
+				So(string(result), ShouldResemble, expected)
+			})
+		})
+	})
+}
