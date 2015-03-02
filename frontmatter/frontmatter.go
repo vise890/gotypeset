@@ -74,10 +74,12 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 	}
 	rawF := parts[0]
 	body = bytes.Join(parts[1:], []byte(frontMatterSeparator))
+
 	f, err = parseFrontMatter(rawF)
 	if err != nil {
 		return frontMatter{}, nil, err
 	}
+
 	return f, body, nil
 }
 
