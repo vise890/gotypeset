@@ -77,7 +77,9 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 	rawMmdIn, _, err := r.FormFile("inputMmd")
 	if err != nil {
-		log.Fatal(err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Must select a file"))
+		return
 	}
 
 	in, err := RegenerateFrontMatter(rawMmdIn)
@@ -89,6 +91,7 @@ func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err.Error())
 	}
 
+	w.Header().Set("Content-Type", "application/pdf")
 	_, err = io.Copy(w, out)
 	if err != nil {
 		log.Fatal(err.Error())
