@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-
-	"github.com/vise890/gotypeset/frontmatter"
 )
 
 var mmd2pdfBin string
@@ -82,7 +80,7 @@ func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err.Error())
 	}
 
-	in, err := frontmatter.RegenerateFrontMatter(rawMmdIn)
+	in, err := RegenerateFrontMatter(rawMmdIn)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

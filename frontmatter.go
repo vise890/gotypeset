@@ -1,4 +1,4 @@
-package frontmatter
+package main
 
 import (
 	"bytes"
@@ -84,18 +84,7 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 }
 
 func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte) {
-	// FIXME: why can't I put this into a $^&%* file?!?!
-	//        - test wants relative path (e.g. ./templates/article.yaml)
-	//        - main app wants path from PJ root (e.g. frontmatter/templates/article.yaml)
-	t := `latex input:        mmd-article-header
-Title:              {{.Title}}
-Author:             {{.Author}}
-Base Header Level:  2
-LaTeX Mode:         memoir
-latex input:        mmd-article-begin-doc
-latex footer:       mmd-memoir-footer
-`
-	articleTemplate, err := template.New("article.yaml").Parse(t)
+	articleTemplate, err := template.New("article.yaml").ParseFiles("./frontmatter_templates/article.yaml")
 	if err != nil {
 		panic(err)
 	}
