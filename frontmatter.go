@@ -91,7 +91,8 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 }
 
 func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte) {
-	articleTemplate, err := template.New("article.yaml").ParseFiles("./frontmatter_templates/article.yaml")
+	articleTemplate, err := template.ParseFiles("./frontmatter_templates/article.yaml")
+
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +122,11 @@ func RegenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
 
 	fullFrontMatter := toLaTeXFrontMatter(inFrontmatter)
 
-	fullMmdB := bytes.Join([][]byte{fullFrontMatter, body}, []byte(frontMatterSeparator))
+	fullMmdB := bytes.Join(
+		[][]byte{
+			fullFrontMatter,
+			body},
+		[]byte(frontMatterSeparator))
 
 	fullMmd = bytes.NewReader(fullMmdB)
 	return fullMmd, nil
