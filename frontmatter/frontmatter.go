@@ -119,6 +119,9 @@ latex footer:       mmd-memoir-footer
 func RegenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
 	rawMmdIn, err := ioutil.ReadAll(mmdIn)
 	inFrontmatter, body, err := splitOutFrontMatter(rawMmdIn)
+	if err != nil {
+		return nil, err
+	}
 
 	fullFrontMatter := toLaTeXFrontMatter(inFrontmatter)
 
