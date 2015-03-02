@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const frontMatterBodySeparator string = "---\n"
+const frontMatterSeparator string = "---\n"
 
 // frontMatter represents the frontmatters that are expected as inputs
 type frontMatter struct {
@@ -27,6 +27,9 @@ const (
 	// AuthorRequiredError is returned if the input frontmatter does
 	// not contain an `author`
 	AuthorRequiredError
+	// FrontMatterRequiredError is returned if the input does not
+	// contain a frontmatter
+	FrontMatterRequiredError
 )
 
 // ParseError is an error that can be returned when
@@ -62,9 +65,15 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 }
 
 func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
-	parts := bytes.Split(mmdIn, []byte(frontMatterBodySeparator))
+	parts := bytes.Split(mmdIn, []byte(frontMatterSeparator))
+	if len(parts) == 1 {
+		return frontMatter{}, []byte{}, ParseError{
+			msg:  "you must specify a frontmatter with a `title` and an `author` (all lowercase)",
+			code: FrontMatterRequiredError,
+		}
+	}
 	rawF := parts[0]
-	body = parts[1]
+	body = bytes.Join(parts[1:], []byte(frontMatterSeparator))
 	f, err = parseFrontMatter(rawF)
 	if err != nil {
 		return frontMatter{}, nil, err
@@ -100,7 +109,7 @@ func RegenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
 
 	fullFrontMatter := toLaTeXFrontMatter(inFrontmatter)
 
-	fullMmdB := bytes.Join([][]byte{fullFrontMatter, body}, []byte(frontMatterBodySeparator))
+	fullMmdB := bytes.Join([][]byte{fullFrontMatter, body}, []byte(frontMatterSeparator))
 
 	fullMmd = bytes.NewReader(fullMmdB)
 	return fullMmd, nil
