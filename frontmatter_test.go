@@ -37,7 +37,7 @@ func TestFrontMatterParsing(t *testing.T) {
 			result, err := parseFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, newError(TitleRequired))
+				So(err, ShouldResemble, ErrTitleRequired)
 			})
 
 			Convey("The parse result should be empty", func() {
@@ -53,7 +53,7 @@ func TestFrontMatterParsing(t *testing.T) {
 			result, err := parseFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, newError(AuthorRequired))
+				So(err, ShouldResemble, ErrAuthorRequired)
 			})
 
 			Convey("The result should be empty", func() {
@@ -146,7 +146,7 @@ func TestFrontMatterSplitting(t *testing.T) {
 			resultFrontMatter, resultBody, err := splitOutFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, newError(FrontMatterRequired))
+				So(err, ShouldResemble, ErrFrontMatterRequired)
 			})
 
 			Convey("The result should contain an empty frontmatter", func() {
@@ -168,7 +168,7 @@ func TestToLaTeXFrontMatter(t *testing.T) {
 			Author: "G. Gopherious",
 		}
 		Convey("When converting to a LaTeX frontmatter", func() {
-			result := toLaTeXFrontMatter(in)
+			result, err := toLaTeXFrontMatter(in)
 
 			Convey("The result should contain the given Title, Author and  the extra LaTeX-specific metadata", func() {
 				expected := `latex input:        mmd-article-header
@@ -180,6 +180,10 @@ latex input:        mmd-article-begin-doc
 latex footer:       mmd-memoir-footer
 `
 				So(string(result), ShouldResemble, expected)
+			})
+
+			Convey("There should be no error", func() {
+				So(err, ShouldBeNil)
 			})
 		})
 	})
@@ -234,7 +238,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, newError(TitleRequired))
+				So(err, ShouldResemble, ErrTitleRequired)
 			})
 
 			Convey("The result should be nil", func() {
@@ -251,7 +255,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, newError(FrontMatterRequired))
+				So(err, ShouldResemble, ErrFrontMatterRequired)
 			})
 
 			Convey("The result should be nil", func() {

@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
@@ -18,46 +18,17 @@ type frontMatter struct {
 	Author string
 }
 
-type errorCode int
-
-const (
+var (
 	// TitleRequired is returned if the input frontmatter does
 	// not contain a `title`
-	TitleRequired errorCode = iota
+	ErrTitleRequired = errors.New("you must specify a `title` (all lowercase) in your frontmatter")
 	// AuthorRequired is returned if the input frontmatter does
 	// not contain an `author`
-	AuthorRequired
+	ErrAuthorRequired = errors.New("you must specify an `author` (all lowercase) in your frontmatter")
 	// FrontMatterRequired is returned if the input does not
 	// contain a frontmatter
-	FrontMatterRequired
+	ErrFrontMatterRequired = errors.New("you must specify a frontmatter with a `title` and an `author` (all lowercase)")
 )
-
-// ParseError is an error that can be returned when
-// parsing frontmatters
-type ParseError struct {
-	msg  string
-	code errorCode
-}
-
-func newError(c errorCode) ParseError {
-	var msg string
-	switch c {
-	case TitleRequired:
-		msg = "you must specify a `title` (all lowercase) in your frontmatter"
-	case AuthorRequired:
-		msg = "you must specify an `author` (all lowercase) in your frontmatter"
-	case FrontMatterRequired:
-		msg = "you must specify a frontmatter with a `title` and an `author` (all lowercase)"
-	}
-	return ParseError{
-		msg:  msg,
-		code: c,
-	}
-}
-
-func (e ParseError) Error() string {
-	return e.msg
-}
 
 func parseFrontMatter(in []byte) (frontMatter, error) {
 	f := frontMatter{}
@@ -66,10 +37,10 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 		return frontMatter{}, err
 	}
 	if f.Title == "" {
-		return frontMatter{}, newError(TitleRequired)
+		return frontMatter{}, ErrTitleRequired
 	}
 	if f.Author == "" {
-		return frontMatter{}, newError(AuthorRequired)
+		return frontMatter{}, ErrAuthorRequired
 	}
 	return f, nil
 }
@@ -77,7 +48,7 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 	parts := bytes.Split(mmdIn, []byte(frontMatterSeparator))
 	if len(parts) == 1 {
-		return frontMatter{}, []byte{}, newError(FrontMatterRequired)
+		return frontMatter{}, []byte{}, ErrFrontMatterRequired
 	}
 	rawF := parts[0]
 	body = bytes.Join(parts[1:], []byte(frontMatterSeparator))
@@ -90,7 +61,7 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 	return f, body, nil
 }
 
-func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte) {
+func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte, err error) {
 	articleTemplate, err := template.ParseFiles("./frontmatter_templates/article.yaml")
 
 	if err != nil {
@@ -100,15 +71,15 @@ func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte) {
 	fullFrontMatterW := bytes.NewBuffer([]byte{})
 	err = articleTemplate.Execute(fullFrontMatterW, inF)
 	if err != nil {
-		log.Fatal("Could not generate a full frontmatter;", err)
+		return nil, err
 	}
 
 	fullFrontMatter, err = ioutil.ReadAll(fullFrontMatterW)
 	if err != nil {
-		log.Fatal("Could not read generated full frontmatter;", err)
+		return nil, err
 	}
 
-	return fullFrontMatter
+	return fullFrontMatter, nil
 }
 
 // RegenerateFrontMatter re-creates the frontmatter of a MultiMarkDown document
@@ -120,7 +91,10 @@ func RegenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
 		return nil, err
 	}
 
-	fullFrontMatter := toLaTeXFrontMatter(inFrontmatter)
+	fullFrontMatter, err := toLaTeXFrontMatter(inFrontmatter)
+	if err != nil {
+		return nil, err
+	}
 
 	fullMmdB := bytes.Join(
 		[][]byte{
