@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"text/template"
@@ -34,7 +35,7 @@ func parseFrontMatter(in []byte) (frontMatter, error) {
 	f := frontMatter{}
 	err := yaml.Unmarshal(in, &f)
 	if err != nil {
-		return frontMatter{}, err
+		return frontMatter{}, fmt.Errorf("Could not unmarshal frontatter: %s", err)
 	}
 	if f.Title == "" {
 		return frontMatter{}, ErrTitleRequired
@@ -71,7 +72,7 @@ func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte, err error) {
 	fullFrontMatterW := bytes.NewBuffer([]byte{})
 	err = articleTemplate.Execute(fullFrontMatterW, inF)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not execute article template: %s", err)
 	}
 
 	fullFrontMatter, err = ioutil.ReadAll(fullFrontMatterW)
@@ -88,12 +89,12 @@ func RegenerateFrontMatter(mmdIn io.Reader) (fullMmd io.Reader, err error) {
 	rawMmdIn, err := ioutil.ReadAll(mmdIn)
 	inFrontmatter, body, err := splitOutFrontMatter(rawMmdIn)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not split out frontmatter: %s", err)
 	}
 
 	fullFrontMatter, err := toLaTeXFrontMatter(inFrontmatter)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Could not convert frontmatter to a MMD/LaTeX one: %s", err)
 	}
 
 	fullMmdB := bytes.Join(

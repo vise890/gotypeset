@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -26,11 +27,11 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 
 		inputF, err := os.Create(inputFileName)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Could not create input file: %s", err)
 		}
 		_, err = io.Copy(inputF, mmdIn)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Could not populate input file: %s", err)
 		}
 
 		yes := exec.Command("yes", "\n")
@@ -45,7 +46,7 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 		}
 		err = mmd2pdf.Start()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Could not start mmd2pdf: %s", err)
 		}
 		err = yes.Start()
 		if err != nil {
@@ -59,7 +60,7 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 
 		outputF, err := os.Open(outputFileName)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Could not open output file: %s", err)
 		}
 
 		return outputF, nil
