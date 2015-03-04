@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 )
 
 var mmd2pdfBin string
@@ -19,54 +20,68 @@ func init() {
 }
 
 func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
-	runMmd2pdf := func() (io.Reader, error) {
-		inputFileName := "in.md"
-		outputFileName := "in.pdf"
+	return withTempDir(func(workingDir string) (io.Reader, error) {
+		inputFileName := path.Join(workingDir, "in.md")
+		outputFileName := path.Join(workingDir, "in.pdf")
 
 		inputF, err := os.Create(inputFileName)
 		if err != nil {
-			log.Fatal("Could not create file in "+inputFileName, err)
+			return nil, err
 		}
 		_, err = io.Copy(inputF, mmdIn)
 		if err != nil {
-			log.Fatal("Could not copy input markdown to disk", err)
+			return nil, err
 		}
 
 		yes := exec.Command("yes", "\n")
+		yes.Path = workingDir
+
 		mmd2pdf := exec.Command(mmd2pdfBin, inputFileName)
-		mmd2pdf.Stdin, _ = yes.StdoutPipe()
-		_ = mmd2pdf.Start()
-		_ = yes.Start()
-		_ = mmd2pdf.Wait()
+		mmd2pdf.Path = workingDir
+
+		mmd2pdf.Stdin, err = yes.StdoutPipe()
+		if err != nil {
+			return nil, err
+		}
+		err = mmd2pdf.Start()
+		if err != nil {
+			return nil, err
+		}
+		err = yes.Start()
+		if err != nil {
+			return nil, err
+		}
+		err = mmd2pdf.Wait()
+		if err != nil {
+			return nil, err
+		}
 		yes.Process.Kill()
 
 		outputF, err := os.Open(outputFileName)
 		if err != nil {
-			log.Fatal("Could not open output file", err)
 			return nil, err
 		}
 
 		return outputF, nil
-	}
-
-	return withTempDir(runMmd2pdf)
+	})
 }
 
 func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 	rawMmdIn, _, err := r.FormFile("inputMmd")
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Must select a file"))
+		http.Error(w, "Must select a file.", http.StatusBadRequest)
 		return
 	}
 
 	in, err := RegenerateFrontMatter(rawMmdIn)
 	if err != nil {
-		log.Fatal(err.Error())
+		http.Error(w, "Could not restructure document for typesetting.", http.StatusInternalServerError)
+		return
 	}
 	out, err := mmd2pdf(in)
 	if err != nil {
-		log.Fatal(err.Error())
+		http.Error(w, "Could not typeset document.", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/pdf")
@@ -81,8 +96,5 @@ func main() {
 	http.HandleFunc("/typeset", typesetMarkdown)
 
 	log.Print("Listening on :9000")
-	err := http.ListenAndServe(":9000", nil)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	log.Fatal(http.ListenAndServe(":9000", nil))
 }
