@@ -8,6 +8,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"github.com/vise890/gotypeset/frontmatter"
 )
 
 var mmd2pdfBin string
@@ -73,7 +75,7 @@ func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	in, err := RegenerateFrontMatter(rawMmdIn)
+	in, err := frontmatter.RegenerateFrontMatter(rawMmdIn)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Could not restructure document for typesetting.", http.StatusInternalServerError)

@@ -1,4 +1,4 @@
-package main
+package frontmatter
 
 import (
 	"bytes"
@@ -63,10 +63,7 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 }
 
 func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte, err error) {
-	articleTemplate, err := template.ParseFiles("./frontmatter_templates/article.yaml")
-	if err != nil {
-		panic(err)
-	}
+	articleTemplate := template.Must(template.New("article.yaml").Parse(Templates["article.yaml"]))
 
 	fullFrontMatterW := bytes.NewBuffer([]byte{})
 	err = articleTemplate.Execute(fullFrontMatterW, inF)
