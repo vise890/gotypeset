@@ -36,7 +36,7 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 
 		yes := exec.Command("yes", "\n")
 		mmd2pdf := exec.Command(mmd2pdfBin, inputFileName)
-		mmd2pdf.Path = workingDir
+		mmd2pdf.Dir = workingDir
 
 		mmd2pdf.Stdin, err = yes.StdoutPipe()
 		if err != nil {
