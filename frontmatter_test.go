@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"gopkg.in/yaml.v2"
 )
 
 func TestFrontMatterParsing(t *testing.T) {
@@ -69,7 +69,7 @@ func TestFrontMatterParsing(t *testing.T) {
 			result, err := parseFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldHaveSameTypeAs, &yaml.TypeError{})
+				So(err, ShouldHaveSameTypeAs, errors.New(""))
 			})
 
 			Convey("The result should be empty", func() {
@@ -146,7 +146,7 @@ func TestFrontMatterSplitting(t *testing.T) {
 			resultFrontMatter, resultBody, err := splitOutFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ErrFrontMatterRequired)
+				So(err.Error(), ShouldContainSubstring, ErrFrontMatterRequired.Error())
 			})
 
 			Convey("The result should contain an empty frontmatter", func() {
@@ -238,7 +238,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ErrTitleRequired)
+				So(err.Error(), ShouldContainSubstring, ErrTitleRequired.Error())
 			})
 
 			Convey("The result should be nil", func() {
@@ -255,7 +255,7 @@ The Cosmos is all that is or ever was or ever will be.`
 			result, err := RegenerateFrontMatter(in)
 
 			Convey("An appropriate error should be returned", func() {
-				So(err, ShouldResemble, ErrFrontMatterRequired)
+				So(err.Error(), ShouldContainSubstring, ErrFrontMatterRequired.Error())
 			})
 
 			Convey("The result should be nil", func() {
