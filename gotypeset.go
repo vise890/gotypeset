@@ -69,17 +69,20 @@ func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 	rawMmdIn, _, err := r.FormFile("inputMmd")
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Must select a file.", http.StatusBadRequest)
 		return
 	}
 
 	in, err := RegenerateFrontMatter(rawMmdIn)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Could not restructure document for typesetting.", http.StatusInternalServerError)
 		return
 	}
 	out, err := mmd2pdf(in)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "Could not typeset document.", http.StatusInternalServerError)
 		return
 	}
@@ -87,7 +90,8 @@ func typesetMarkdown(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/pdf")
 	_, err = io.Copy(w, out)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Println(err)
+		http.Error(w, "Could not typeset document.", http.StatusInternalServerError)
 	}
 }
 
