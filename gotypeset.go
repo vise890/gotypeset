@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 
 	"github.com/vise890/gotypeset/frontmatter"
 )
@@ -24,8 +24,8 @@ func init() {
 
 func mmd2pdf(mmdIn io.Reader) (pdfOut io.Reader, err error) {
 	return withTempDir(func(workingDir string) (io.Reader, error) {
-		inputFileName := path.Join(workingDir, "in.md")
-		outputFileName := path.Join(workingDir, "in.pdf")
+		inputFileName := filepath.Join(workingDir, "in.md")
+		outputFileName := filepath.Join(workingDir, "in.pdf")
 
 		inputF, err := os.Create(inputFileName)
 		if err != nil {
