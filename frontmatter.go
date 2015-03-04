@@ -64,7 +64,6 @@ func splitOutFrontMatter(mmdIn []byte) (f frontMatter, body []byte, err error) {
 
 func toLaTeXFrontMatter(inF frontMatter) (fullFrontMatter []byte, err error) {
 	articleTemplate, err := template.ParseFiles("./frontmatter_templates/article.yaml")
-
 	if err != nil {
 		panic(err)
 	}
